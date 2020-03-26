@@ -62,3 +62,7 @@ for i in range()
     add to train, remove from pool
 """
 
+
+
+
+# Compare results to random baseline
