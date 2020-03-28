@@ -2,50 +2,32 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression as Log
 from sklearn.metrics import accuracy_score
 
-model = Log(penlty = 'l2', multi_class= 'multinomial', max_iter= 100)
 
 
 class UncertaintySampling:
-    def __init__(self, model, Xtrain, ytrain, Xtest, ytest, pool):
+    def __init__(self, model, pool, addn):
         super().__init__()
         self.model = model
-        self.Xtrain = Xtrain
-        self.ytrain = ytrain
-        self.Xpool = pool
-        self.Xtest = Xtest
-        self.ytest = ytest
-        self.acc_LC = []
-        self.acc_E = []
-        self.acc_MS = []
+        self.pool = pool
+        self.addn = addn
 
     def LeastConfident(self):
-        model.fit(self.Xtrain, self.ytrain)
-        y_estimate = model.predict(self.Xtest)
-        self.acc_LC.append(len(self.Xtrain), accuracy_score(self.ytest, y_estimate))
-
-        pool_p = model.predict_proba(self.Xpool)
-        x_star = np.argsort(pool_p.max(1))[:addn]
-
+        pool_p = self.model.predict_proba(self.pool)
+        x_star = np.argsort(pool_p.max(1))[:self.addn]
+        return x_star
+        
     def Entropy(self):
-        model.fit(self.Xtrain, self.ytrain)
-        y_estimate = model.predict(self.Xtest)
-        self.acc_LC.append(len(self.Xtrain), accuracy_score(self.ytest, y_estimate))
-
-        pool_p = model.predict_proba(self.Xpool)
+        pool_p = self.model.predict_proba(self.pool)
         Entropy = pool_p * np.log(1/pool_p)
         Information_gain = np.argsort(np.sum(Entropy, axis = 1))
-        x_star = Information_gain[-addn:]
+        x_star = Information_gain[-self.addn:]
+        return x_star
 
     def Margin(self):
-        model.fit(self.Xtrain, self.ytrain)
-        y_estimate = model.predict(self.Xtest)
-        self.acc_LC.append(len(self.Xtrain), accuracy_score(self.ytest, y_estimate))
-
-        pool_p = np.sort(model.predict_proba(self.Xpool), axis = 1)
+        pool_p = np.sort(self.model.predict_proba(self.pool), axis = 1)
         Margin = np.argsort(pool_p[:,-1] - pool_p[:,-2])
-
-        x_star = Margin[:addn]
+        x_star = Margin[:self.addn]
         
-
+        return x_star
     
     

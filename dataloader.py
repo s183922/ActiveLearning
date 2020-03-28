@@ -26,7 +26,7 @@ def load_mnist(path, kind='train'):
 
     return images, labels
 
-def datasets(path):
+def datasets(path, poolnum = 20000):
     #input: Path as string, should be 'data'
     X_train, y_train = load_mnist(path, kind='train')
     X_test, y_test = load_mnist(path, kind='t10k')
@@ -37,7 +37,7 @@ def datasets(path):
     order = np.random.permutation(range(len(X_train)))
     #define the size of the pool, and define the part of the trainingset
     #will be in the pool from the permutation
-    poolnum = 20000
+    
     poolset = order[:poolnum]
 
     #Take and define the pool from the trainingset
@@ -46,5 +46,7 @@ def datasets(path):
     
     #define the new trainset without the pool
     trainidx = np.setdiff1d(trainidx,poolset)
+    
+    return X_train[trainidx], y_train[trainidx], X_test, y_test, Xpool, ypool, np.arange(len(Xpool), dtype = np.int)
 
-    return X_train, y_train, X_test, y_test, Xpool, ypool, trainidx
+

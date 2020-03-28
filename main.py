@@ -1,17 +1,45 @@
 from sklearn.linear_model import LogisticRegression as Log
+from sklearn.tree import DecisionTreeClassifier as Tree
+from sklearn.metrics import accuracy_score
 from dataloader import *
+from UncertaintySampling import *
+import os, sys
+path = sys.path[0]
+os.chdir(path)
 
+def BaseLine(pool, addn):
+    return np.random.choice(np.arange(len(pool), dtype = np.int), addn, replace=False)
 
-Xtrain, ytrain = dataloader
-Xpool, ypool = dataloader
-Xtest, ytest = dataloader
-pool_index = dataloader
+X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
+
 
 # Multinomial Logistic Regression Classifier
-model = Log(penlty = 'l2', multi_class= 'multinomial', max_iter= 100)
 
-# Data Points to add each time
-add_n = 50
+model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 20, solver='lbfgs', verbose=1)
+addn = 10
+test_acc = []
+for i in range(20):
+
+    model.fit(X_train, y_train)
+    ye = model.predict(X_test)
+    test_acc.append(accuracy_score(y_test, ye))
+
+    method = UncertaintySampling(model, Xpool[poolidx], addn)
+    x_star = method.Entropy()
+    # x_star = BaseLine(poolidx, addn)
+
+    
+    X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
+    y_train = np.concatenate((y_train, ypool[poolidx[x_star]]))
+
+    poolidx = np.setdiff1d(poolidx, x_star)
+
+
+plt.plot(np.arange(20),test_acc)
+plt.show()
+
+
+    
 
 
 # Testing QBC
