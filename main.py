@@ -14,24 +14,25 @@ X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', pooln
 
 
 # Multinomial Logistic Regression Classifier
-
 model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 20, solver='lbfgs', verbose=1)
 addn = 10
 test_acc = []
-for i in range(20):
 
+for i in range(20):
+    # Fit model and make predicitons
     model.fit(X_train, y_train)
     ye = model.predict(X_test)
     test_acc.append(accuracy_score(y_test, ye))
 
+    # Choice of Active Learning method
     method = UncertaintySampling(model, Xpool[poolidx], addn)
     x_star = method.Entropy()
     # x_star = BaseLine(poolidx, addn)
 
-    
+
+    # Add to train - remove from pool
     X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
     y_train = np.concatenate((y_train, ypool[poolidx[x_star]]))
-
     poolidx = np.setdiff1d(poolidx, x_star)
 
 
