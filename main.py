@@ -4,41 +4,24 @@ from sklearn.metrics import accuracy_score
 from dataloader import *
 from UncertaintySampling import *
 import os, sys
+import  matplotlib.pyplot as plt
 path = sys.path[0]
 os.chdir(path)
 
-def BaseLine(pool, addn):
-    return np.random.choice(np.arange(len(pool), dtype = np.int), addn, replace=False)
 
 X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
 
 
 # Multinomial Logistic Regression Classifier
-model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 20, solver='lbfgs', verbose=1)
-addn = 10
-test_acc = []
+model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
+addn = 5
 
-for i in range(20):
-    # Fit model and make predicitons
-    model.fit(X_train, y_train)
-    ye = model.predict(X_test)
-    test_acc.append(accuracy_score(y_test, ye))
+test_acc = Uncertainty_Sampling(X_train.copy(), y_train.copy(), X_test.copy(), y_test.copy(),
+                     model, Xpool.copy(), ypool.copy(), poolidx.copy(),
+                     n_iter = 200, addn = addn, method = "Entropy")
 
-    # Choice of Active Learning method
-    method = UncertaintySampling(model, Xpool[poolidx], addn)
-    x_star = method.Entropy()
-    # x_star = BaseLine(poolidx, addn)
-
-
-    # Add to train - remove from pool
-    X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
-    y_train = np.concatenate((y_train, ypool[poolidx[x_star]]))
-    poolidx = np.setdiff1d(poolidx, x_star)
-
-
-plt.plot(np.arange(20),test_acc)
+plt.plot(*zip(*test_acc))
 plt.show()
-
 
     
 
