@@ -3,13 +3,15 @@ from sklearn.tree import DecisionTreeClassifier as Tree
 from sklearn.metrics import accuracy_score
 from dataloader import *
 from UncertaintySampling import *
+from ExpectedModelChange import *
 import os, sys
+from sklearn.utils import resample
 import  matplotlib.pyplot as plt
 path = sys.path[0]
 os.chdir(path)
 
 
-X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
+X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
 
 
 # Multinomial Logistic Regression Classifier
@@ -18,15 +20,21 @@ addn = 1
 
 methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
 for method in methods:
-    test_acc = Uncertainty_Sampling(X_train.copy(), y_train.copy(), X_test.copy(), y_test.copy(),
+    test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
                      model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-                     n_iter = 400, addn = addn, method = method)
+                     n_iter = 100, addn = addn, method = method)
 
     plt.plot(*zip(*test_acc))
 plt.legend(methods)
 plt.show()
 
-    
+
+# test_acc = expModelChange(X_train.copy(), y_train.copy(), X_test.copy(), y_test.copy(),
+#                 model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=100)
+
+# plt.plot(*zip(*test_acc))
+# # plt.legend(methods)
+# plt.show()
 
 
 # Testing QBC

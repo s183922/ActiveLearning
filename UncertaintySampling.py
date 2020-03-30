@@ -71,8 +71,8 @@ def Entropy(model, pool, addn):
     pool_p = model.predict_proba(pool)
 
     # Calculate entropy and sort for each datapoint in pool
-    Entropy = pool_p * np.log(1/pool_p)
-    Information_gain = np.argsort(np.sum(Entropy, axis = 1))
+    Entropy = (pool_p * np.log(1/pool_p)).sum(axis = 1)
+    Information_gain = np.argsort(Entropy)
 
     # Choose addn datapoints with highest entropy
     x_star = Information_gain[-addn:]
