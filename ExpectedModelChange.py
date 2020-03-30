@@ -18,11 +18,11 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
         testacc_emc.append((len(X_train), accuracy_score(y_test, ye)))
 
         # Get probability distribution over labels
-        p_pred = model.predict_proba(pool)
+        p_pred = model.predict_proba(Xpool)
 
         # select model with largest expected gradient length
-        gradJ = gradJ(pool, theta, p_pred)  # theta: model.coef? paramerers!
-        x_star = ExpGradL(gradJ, p_pred)
+        grad = gradJ(Xpool, model.coef_, p_pred)  # theta: model.coef? paramerers!
+        x_star = ExpGradL(grad, p_pred)
 
         # Add to train - remove from pool
         X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
@@ -39,7 +39,7 @@ def g(z):  # sigmoid function
 
 
 def h_logistic(pool, theta):  # Model function
-    return g(np.dot(pool, theta))
+    return g(np.dot(pool, theta.T))
 
 
 def J(pool, theta, y):  # Cost Function

@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score
 from dataloader import *
 from UncertaintySampling import *
 from ExpectedModelChange import *
+from QBC_func import *
 import os, sys
 from sklearn.utils import resample
 import  matplotlib.pyplot as plt
@@ -18,19 +19,23 @@ X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', pooln
 model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
 addn = 1
 
-methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
-for method in methods:
-    test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-                     model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-                     n_iter = 100, addn = addn, method = method)
+# methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
+# for method in methods:
+#     test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+#                      model, Xpool.copy(), ypool.copy(), poolidx.copy(),
+#                      n_iter = 100, addn = addn, method = method)
 
-    plt.plot(*zip(*test_acc))
-plt.legend(methods)
+#     plt.plot(*zip(*test_acc))
+# test_acc = expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+#                 model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=100)
+
+QBC(X_train[:100].copy(), y_train[:100].copy(), X_test, y_test, Xpool.copy(), ypool.copy(), model, poolidx.copy(), n_model = 20, n_iter = 100)
+plt.plot(*zip(*test_acc))
+plt.legend(methods + ["Expected Gradient"])
 plt.show()
 
 
-# test_acc = expModelChange(X_train.copy(), y_train.copy(), X_test.copy(), y_test.copy(),
-#                 model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=100)
+
 
 # plt.plot(*zip(*test_acc))
 # # plt.legend(methods)
