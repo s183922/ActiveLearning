@@ -43,6 +43,7 @@ def Uncertainty_Sampling(X_train, y_train, X_test, y_test, model, Xpool, ypool, 
        
 
         # Add to train - remove from pool
+        
         X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
         y_train = np.concatenate((y_train, ypool[poolidx[x_star]]))
         poolidx = np.setdiff1d(poolidx, x_star)

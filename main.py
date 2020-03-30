@@ -19,19 +19,23 @@ X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', pooln
 model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
 addn = 1
 
-# methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
-# for method in methods:
-#     test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-#                      model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-#                      n_iter = 100, addn = addn, method = method)
+methods = ["Baseline"]
+for method in methods:
+    test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+                     model, Xpool.copy(), ypool.copy(), poolidx.copy(),
+                     n_iter = 100, addn = addn, method = method)
 
-#     plt.plot(*zip(*test_acc))
+    plt.plot(*zip(*test_acc))
 # test_acc = expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-#                 model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=100)
+#                 model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=20)
+# plt.plot(*zip(*test_acc))
 
-QBC(X_train[:100].copy(), y_train[:100].copy(), X_test, y_test, Xpool.copy(), ypool.copy(), model, poolidx.copy(), n_model = 20, n_iter = 100)
+test_acc = QBC(X_train[:100].copy(), y_train[:100].copy(), X_test, y_test,
+         model, Xpool.copy(), ypool.copy(), poolidx.copy(),n_iter = 20, n_model = 100)
 plt.plot(*zip(*test_acc))
-plt.legend(methods + ["Expected Gradient"])
+
+# plt.plot(*zip(*test_acc))
+plt.legend(["Baseline", "QBC"])
 plt.show()
 
 
