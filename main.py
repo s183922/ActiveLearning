@@ -14,13 +14,16 @@ X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', pooln
 
 # Multinomial Logistic Regression Classifier
 model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
-addn = 5
+addn = 1
 
-test_acc = Uncertainty_Sampling(X_train.copy(), y_train.copy(), X_test.copy(), y_test.copy(),
+methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
+for method in methods:
+    test_acc = Uncertainty_Sampling(X_train.copy(), y_train.copy(), X_test.copy(), y_test.copy(),
                      model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-                     n_iter = 200, addn = addn, method = "Entropy")
+                     n_iter = 400, addn = addn, method = method)
 
-plt.plot(*zip(*test_acc))
+    plt.plot(*zip(*test_acc))
+plt.legend(methods)
 plt.show()
 
     
