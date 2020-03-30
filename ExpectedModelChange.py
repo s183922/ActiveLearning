@@ -18,11 +18,11 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
         testacc_emc.append((len(X_train), accuracy_score(y_test, ye)))
 
         # Get probability distribution over labels
-        p_pred = model.predict_proba(pool)
+        p_pred = model.predict_proba(Xpool[poolidx])
 
         # select model with largest expected gradient length
-        gradJ = gradJ(pool, theta, p_pred)  # theta: model.coef? paramerers!
-        x_star = ExpGradL(gradJ, p_pred)
+        gradient_J = gradJ(Xpool[poolidx], model.coef_, p_pred)
+        x_star = ExpGradL(gradient_J, p_pred)
 
         # Add to train - remove from pool
         X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
@@ -37,16 +37,13 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
 def g(z):  # sigmoid function
     return 1.0 / (1.0 + np.exp(-z))
 
-
 def h_logistic(pool, theta):  # Model function
     return g(np.dot(pool, theta))
-
 
 def J(pool, theta, y):  # Cost Function
     m = y.size
     cost = -(np.sum(np.log(h_logistic(pool, theta))) + np.dot((y - 1).T, (np.dot(pool, theta)))) / m
     return cost
-
 
 # EVENTUELT Regularization..?
 # def J_reg(X,a,y,reg_lambda) :
@@ -56,7 +53,6 @@ def J(pool, theta, y):  # Cost Function
 def gradJ(pool, theta, y):  # Gradient of Cost Function, y should be p_pool
     m = y.size
     return (np.dot(pool.T, (h_logistic(pool, theta) - y))) / m
-
 
 def ExpGradL(gradJ, y):
     x_star = np.argmax(np.sum(np.dot(y, LA.norm(gradJ))))
