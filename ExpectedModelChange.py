@@ -1,10 +1,47 @@
 import numpy as np
 from numpy import linalg as LA
 from sklearn.metrics import accuracy_score
-import math
+
+#hope this works
+
+def normgrad(x, theta, C=1):
+    #probability of each class
+    # Get probability distribution over labels, vector
+    p_pred = model.predict_proba(Xpool[poolidx])
+
+    #derivative of cost as derived for each class
+    #defined in paper
+
+    m = len(y_train)
+    sumM = []
+    sumK = []
+
+    probJ = 0
+    eval = 1
+
+    for i in range(m):
+        for k in ypool:
+            for j in ypool:
+                probJ += exp(np.transpose(theta[j])*x[i])
+            pred = (exp(np.transpose(theta[k])*x[i]))/(probJ)
+            if y_train != k:
+                eval = 0
+            form = x[i]*(eval-pred)
+            sumK += form
+    sumM += sumK
+
+    gradcost = -sumM
+
+    #take norm and add probability
+    #for alle punkter udregner den emc, i store funktion tager den det punkt med den bedste
+    #emc og laver query på.
+    emc = np.dot(p_pred, LA.norm(gradcost))
+    #x_star tager argmax af denne sum
+
+    return emc
 
 
-def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolidx, n_iter=100):
+def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolidx, n_iter=100, addn =2):
     """
     ExpModelChange defines the change in model after the model has learned a new label
     The query strategy selects the x with the largest expected gradient length with respect to the
@@ -14,50 +51,30 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
     for i in range(n_iter):
         # Fit model and make predicitons
         model.fit(X_train, y_train)
+        emc = normgrad(model.coef_, Xpool[poolidx])
         ye = model.predict(X_test)
         testacc_emc.append((len(X_train), accuracy_score(y_test, ye)))
 
-        # Get probability distribution over labels
-        p_pred = model.predict_proba(Xpool[poolidx])
-
-        # select model with largest expected gradient length
-        gradient_J = gradJ(Xpool[poolidx], model.coef_, p_pred)
-        x_star = ExpGradL(gradient_J, p_pred)
+        #for hver gang den kører dette loop, tager den for et x-pool noget den gerne vil evaluere og så evaluerer vi
+        #modellen efter den har evalueret dette punkt.
 
         # Add to train - remove from pool
-        X_train = np.concatenate((X_train, Xpool[poolidx[x_star]]))
-        y_train = np.concatenate((y_train, ypool[poolidx[x_star]]))
-        poolidx = np.setdiff1d(poolidx, x_star)
-        print("Expected model with {:} trainingpoints".format(len(X_train)))
+        ypool_p_sort_idx = np.argmax(emc)
+        X_train = np.concatenate((X_train, Xpool[poolidx[ypool_p_sort_idx]]))
+        y_train = np.concatenate((y_train, ypool[poolidx[ypool_p_sort_idx]]))
+        poolidx = np.setdiff1d(poolidx, ypool_p_sort_idx)
+        print("Expected model with {:} training-points".format(len(X_train)))
 
     return testacc_emc
 
 
-# Define objective function - cost function (for each pool point)
-def g(z):  # sigmoid function
-    return 1.0 / (1.0 + np.exp(-z))
 
-def h_logistic(pool, theta):  # Model function
-    return g(np.dot(pool, theta))
 
-def J(pool, theta, y):  # Cost Function
-    m = y.size
-    cost = -(np.sum(np.log(h_logistic(pool, theta))) + np.dot((y - 1).T, (np.dot(pool, theta)))) / m
-    return cost
 
-# EVENTUELT Regularization..?
-# def J_reg(X,a,y,reg_lambda) :
-#    m = y.size
-#    return J(X,a,y) + reg_lambda/(2.0*m) * np.dot(a[1:],a[1:])
 
-def gradJ(pool, theta, y):  # Gradient of Cost Function, y should be p_pool
-    m = y.size
-    return (np.dot(pool.T, (h_logistic(pool, theta) - y))) / m
 
-def ExpGradL(gradJ, y):
-    x_star = np.argmax(np.sum(np.dot(y, LA.norm(gradJ))))
 
-    return np.argsort(x_star)
+
 
 # def Calcost(theta, X, C=1.):
 
