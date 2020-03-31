@@ -29,16 +29,34 @@ for i, method in enumerate(methods):
                      n_iter = 100, addn = 1, method = method)
         test[i].append(test_acc)
 
+plt.plot(*zip(*test_acc))
+
 filehandler = open("UncertaintyTest.obj","wb")
 pickle.dump(test, filehandler)
 filehandler.close()
 
 
-# test_acc = expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-#                  model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=20)
-# filehandler = open("ExpectedGradient.obj","wb")
-# pickle.dump(test, filehandler)
-# filehandler.close()
+
+
+
+
+
+
+np.random.seed(2020)
+
+for j in range(20):
+    X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
+    test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+                                    model, Xpool.copy(), ypool.copy(), poolidx.copy(),
+                                    n_iter = 100, addn = 1, method = method)
+    test[i].append(test_acc)
+
+    test_acc = expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+                          model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=20)
+
+filehandler = open("ExpectedGradient.obj","wb")
+pickle.dump(test, filehandler)
+filehandler.close()
 
 # test_acc = QBC(X_train[:100].copy(), y_train[:100].copy(), X_test, y_test,
 #          model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter = 100, n_model = 10)
