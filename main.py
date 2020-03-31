@@ -99,7 +99,7 @@ for i in range()
 """
 for i in range()
     for each datapoint compute gradient of loss function
-    finde point with largest gradient
+    query selects point with largest gradient
 
     add to train, remove from pool
 """
