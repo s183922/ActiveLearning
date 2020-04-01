@@ -3,7 +3,7 @@ from sklearn.tree import DecisionTreeClassifier as Tree
 from sklearn.metrics import accuracy_score
 from dataloader import *
 from UncertaintySampling import *
-from ExpectedModelChange import *
+from ExpectedModelChange_old import *
 from QBC_func import *
 import pickle
 import os, sys
