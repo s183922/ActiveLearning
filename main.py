@@ -13,46 +13,40 @@ path = sys.path[0]
 os.chdir(path)
 
 
-
+X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
 
 # Multinomial Logistic Regression Classifier
 model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
 
-methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
-test = [[] for _ in methods]
-for i, method in enumerate(methods):
-    np.random.seed(2020)
-    for j in range(20):
-        X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
-        test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-                     model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-                     n_iter = 100, addn = 1, method = method)
-        test[i].append(test_acc)
+# methods = ["Least Confident", "Entropy", "Margin", "Baseline"]
+# test = [[] for _ in methods]
+# for i, method in enumerate(methods):
+#     np.random.seed(2020)
+#     for j in range(20):
+#         X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
+#         test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+#                      model, Xpool.copy(), ypool.copy(), poolidx.copy(),
+#                      n_iter = 100, addn = 1, method = method)
+#         test[i].append(test_acc)
 
-plt.plot(*zip(*test_acc))
+# plt.plot(*zip(*test_acc))
 
-filehandler = open("UncertaintyTest.obj","wb")
-pickle.dump(test, filehandler)
-filehandler.close()
-
-
-
-
+# filehandler = open("UncertaintyTest.obj","wb")
+# pickle.dump(test, filehandler)
+# filehandler.close()
 
 
 
 
 np.random.seed(2020)
-
+test = []
 for j in range(20):
+    print("Iteration {:}".format(j))
     X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
-    test_acc = Uncertainty_Sampling(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-                                    model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-                                    n_iter = 100, addn = 1, method = method)
-    test[i].append(test_acc)
-
     test_acc = expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-                          model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=20)
+                          model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=100)
+
+    test.append(test_acc)
 
 filehandler = open("ExpectedGradient.obj","wb")
 pickle.dump(test, filehandler)
