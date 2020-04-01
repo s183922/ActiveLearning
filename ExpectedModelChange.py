@@ -6,12 +6,12 @@ import random
 from sklearn.linear_model import LogisticRegression as Log
 # hope this works
 
-random.seed(10)
+#random.seed(10)
 
-X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
+#X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
 
-model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
-addn = 5
+#model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
+#addn = 5
 
 n_model = 10
 
