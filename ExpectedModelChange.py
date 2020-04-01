@@ -6,16 +6,16 @@ import random
 from sklearn.linear_model import LogisticRegression as Log
 # hope this works
 
-random.seed(10)
+# random.seed(10)
 
-X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
+# X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 59900)
 
-model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
-addn = 5
+# model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='lbfgs')
+# addn = 5
 
-n_model = 10
+# n_model = 10
 
-ye = np.zeros([n_model,Xpool.shape[0]])
+# ye = np.zeros([n_model,Xpool.shape[0]])
 
 def normgrad(x, theta, y_train, model, ypool):
     # probability of each class
@@ -32,7 +32,7 @@ def normgrad(x, theta, y_train, model, ypool):
     probJ = []
     eval = 1
     #np.exp(np.transpose(theta[j]) * x[i])
-
+    print("Eval Gradient...")
     for i in range(m):
         for k,k_real in enumerate(ypool):
             probJ = np.zeros(len(ypool),dtype=object)
@@ -40,7 +40,7 @@ def normgrad(x, theta, y_train, model, ypool):
                 probJ[j] = np.exp(np.transpose(theta[j]) * x[i])
             probJ = np.sum(probJ)
             pred = (np.exp(np.transpose(theta[k]) * x[i]))/(probJ)
-            if y_train[i] != k_real:
+            if y_train[i] != k_real:    
                 eval = 0
             form = x[i] * (eval - pred)
             sumK.append(form)
@@ -56,8 +56,18 @@ def normgrad(x, theta, y_train, model, ypool):
 
     return emc
 
-print("here")
-
+# print("here")
+def ExpectedGrad(Xpool, pool_p):
+    eg = []
+    for i,x in enumerate(Xpool):
+        B = np.eye(10)
+        C = B - pool_p[i]
+        G = []
+        for j, c in enumerate(C):
+            GradL = np.linalg.norm(np.array([x * p for p in c]))
+            G.append(pool_p[i][j] * GradL)
+        eg.append(np.sum(G))
+    return eg
 
 def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolidx, n_iter=100):
     """
@@ -69,7 +79,8 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
     for i in range(n_iter):
         # Fit model and make predicitons
         model.fit(X_train, y_train)
-        emc = normgrad(model.coef_, Xpool[poolidx], y_train, model, ypool)
+        pool_p = model.predict_proba(Xpool)
+        emc = ExpectedGrad(Xpool[poolidx], pool_p)
         ye = model.predict(X_test)
         testacc_emc.append((len(X_train), accuracy_score(y_test, ye)))
 
@@ -78,17 +89,23 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
 
         # Add to train - remove from pool
         ypool_p_sort_idx = np.argmax(emc)
-        X_train = np.concatenate((X_train, Xpool[poolidx[ypool_p_sort_idx]]))
-        y_train = np.concatenate((y_train, ypool[poolidx[ypool_p_sort_idx]]))
-        poolidx = np.setdiff1d(poolidx, ypool_p_sort_idx)
+        print(ypool_p_sort_idx)
+        print(len(poolidx))
+        X_train = np.concatenate((X_train, Xpool[poolidx[ypool_p_sort_idx]].reshape(1,-1)))
+        y_train = np.concatenate((y_train, ypool[poolidx[ypool_p_sort_idx]].reshape(-1)))
+        poolidx = np.setdiff1d(poolidx, poolidx[ypool_p_sort_idx])
         print("Expected model change with {:} training-points".format(len(X_train)))
 
     return testacc_emc
-print("here2")
 
-print(expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
-                     model, Xpool.copy(), ypool.copy(), poolidx.copy(),
-                     n_iter=100))
+
+# print("here2")
+
+
+
+# print(expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
+#                      model, Xpool.copy(), ypool.copy(), poolidx.copy(),
+#                      n_iter=100))
 
 # def Calcost(theta, X, C=1.):
 
