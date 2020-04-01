@@ -80,7 +80,7 @@ def expModelChange(X_train, y_train, X_test, y_test, model, Xpool, ypool, poolid
         ypool_p_sort_idx = np.argmax(emc)
         X_train = np.concatenate((X_train, Xpool[poolidx[ypool_p_sort_idx]]))
         y_train = np.concatenate((y_train, ypool[poolidx[ypool_p_sort_idx]]))
-        poolidx = np.setdiff1d(poolidx, ypool_p_sort_idx)
+        poolidx = np.setdiff1d(poolidx, poolidx[ypool_p_sort_idx])
         print("Expected model change with {:} training-points".format(len(X_train)))
 
     return testacc_emc
