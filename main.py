@@ -41,7 +41,7 @@ model = Log(penalty = 'l2', multi_class= 'multinomial', max_iter= 500, solver='l
 np.random.seed(2020)
 test = []
 for j in range(20):
-    print("Iteration {:}".format(j))
+    print("Iteration     {:}".format(j))
     X_train, y_train, X_test, y_test, Xpool, ypool, poolidx = datasets('data', poolnum = 1000)
     test_acc = expModelChange(X_train[:100].copy(), y_train[:100].copy(), X_test.copy(), y_test.copy(),
                           model, Xpool.copy(), ypool.copy(), poolidx.copy(), n_iter=100)

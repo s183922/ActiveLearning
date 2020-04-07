@@ -23,7 +23,7 @@ obj = [obj3] + [obj1] + obj2
 
 fig = plt.figure(figsize = (10,20))
 fig.add_subplot(1,3,1)
-methods = ["Expected model Change", "QBC","Least Confident", "Entropy", "Margin", "Baseline"]
+methods = ["EMC", "QBC","LC", "Entropy", "Margin", "Baseline"]
 cols = ["C0","C1","C2","C3","C4", "C5"]
 for i in range(len(methods)):
     L = []
@@ -51,7 +51,7 @@ for i in range(len(methods)):
                 capprops= dict(color = cols[i]),
                 patch_artist = True)
 plt.grid(axis = "y", linestyle = "dashed")
-plt.xticks(np.arange(5), methods)
+plt.xticks(np.arange(6), methods)
 plt.ylabel("Accuracy Score")
 plt.title("Accuracy score with 200 Datapoints")
 fig.add_subplot(1,3,3)
@@ -67,7 +67,7 @@ for i in range(len(methods)):
     plt.vlines(i, conf_int[0], conf_int[1], colors = cols[i], linestyles= "dashed")
 
     G.append(L)
-plt.xticks(np.arange(5), methods)
+plt.xticks(np.arange(6), methods)
 plt.grid(axis = "y", linestyle="dashed")
 plt.ylabel("Accuracy Score")
 plt.title("Confidence interval of mean accuracy score with 200 Datapoints")
