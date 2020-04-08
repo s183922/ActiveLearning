@@ -67,7 +67,7 @@ for i in range(len(methods)):
     plt.vlines(i, conf_int[0], conf_int[1], colors = cols[i], linestyles= "dashed")
 
     G.append(L)
-plt.xticks(np.arange(5), methods)
+plt.xticks(np.arange(6), methods)
 plt.grid(axis = "y", linestyle="dashed")
 plt.ylabel("Accuracy Score")
 plt.title("Confidence interval of mean accuracy score with 200 Datapoints")
